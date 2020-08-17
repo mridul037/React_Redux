@@ -1,0 +1,65 @@
+//you can get state by getState method
+class Store {
+  constructor(reducer, initialState) {
+    this.reducer = reducer;
+    this.state = initialState;
+  }
+
+  getState() {
+    return this.state;
+  }
+  dispatch(update) {
+    this.state = this.reducer(this.state, update);
+  }
+}
+const DEFAULT_STATE = { user: {}, contact: [] };
+const merge = (prev, next) => Object.assign({}, prev, next);
+
+//reducer takes prev state and gives new state
+//reducer=(prev,next)=>merger(prev,next)
+//multiple reducer
+const contactReducer = (state, action) => {
+  if (action.type === UPDATE_CONTACT) {
+    return [...state, action.payload];
+  }
+  return state;
+};
+//this reducer responds to two actions
+const userReducer = (state, action) => {
+  if (action.type === UPDATE_USER) {
+    return merge(state, action.payload);
+  }
+  if (action.type === UPDATE_CONTACT) {
+    return merge(state,{newContact:action.payload});
+  }
+  return state;
+};
+
+const reducer = (state, action) => ({
+  user: userReducer(state.user,action),
+  contact: contactReducer(state.contact,action),
+});
+
+//action creator
+const updateUser = (update) => ({
+  type: UPDATE_USER,
+  payload: update,
+});
+const updateContact = (update) => ({
+  type: UPDATE_CONTACT,
+  payload: update,
+});
+
+const store = new Store(reducer, DEFAULT_STATE);
+//var for action
+const UPDATE_USER = "UDPATE_CONTACT";
+const UPDATE_CONTACT = "UPDATE_USER";
+//we update state by dispaching action
+//action contain all info we need to update our state
+//action-object with type key
+
+store.dispatch(updateUser({ foo: "foo" }));
+store.dispatch(updateUser({ foo: "foo" }));
+store.dispatch(updateUser({ bar: "bar" }));
+store.dispatch(updateContact({ name: "mri", number: "888" }));
+console.log(store.getState());
